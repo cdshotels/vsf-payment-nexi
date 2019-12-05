@@ -61,7 +61,7 @@ export default {
   },
 ```
 
-And to you template add the nexi iframe before `button-full`:
+And to you template add the nexi drop-in before `button-full`:
 
 ```html
 <nexi-drop-in v-if="payment.paymentMethod === 'vsfnexi'" />
@@ -103,7 +103,7 @@ Add the following also to your `config/local.json` need set `nexi.env` to `sandb
 ```json
   "extensions": {
     "nexi": {
-      "env": "sandbox", // or production
+      "env": "sandbox",
       "clientId": "",
       "secret": ""
     },
