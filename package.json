@@ -1,0 +1,33 @@
+{
+  "name": "vsf-payment-nexi",
+  "version": "0.1.0",
+  "description": "The Nexi payment module built for vue-storefront by CDSHotels.",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cdshotels/vsf-payment-braintree.git"
+  },
+  "keywords": [
+    "vue-storefront-nexi",
+    "vsf-payment-nexi",
+    "cdshotels/vue-storefront-nexi",
+    "cdshotels",
+    "vue-storefront",
+    "divanteltd/vue-storefront"
+  ],
+  "author": "Libor Pansky <l.pansky@cdshotels.it> (https://cdshotels.it)",
+  "maintainers": [
+    "Libor Pansky <l.pansky@cdshotels.it> (https://cdshotels.it)"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/cdshotels/vsf-payment-braintree.git/issues"
+  },
+  "homepage": "https://github.com/cdshotels/vsf-payment-braintree.git"
+}
