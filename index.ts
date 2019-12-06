@@ -6,7 +6,7 @@ import { module } from './store';
 import { isServer } from '@vue-storefront/core/helpers';
 // import { currentStoreView } from "@vue-storefront/core/lib/multistore";
 
-export const PaymentNexiModule: StorefrontModule = function({
+export const PaymentNexiModule: StorefrontModule = function ({
   store,
   appConfig
 }) {

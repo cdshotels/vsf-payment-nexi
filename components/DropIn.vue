@@ -3,6 +3,9 @@
 </template>
 
 <script>
+/* global XPay */
+/* eslint no-undef: "error" */
+
 import { mapGetters } from 'vuex';
 import store from '@vue-storefront/core/store';
 import { currentStoreView } from '@vue-storefront/core/lib/multistore';
@@ -10,36 +13,36 @@ import EventBus from '@vue-storefront/core/compatibility/plugins/event-bus';
 
 export default {
   name: 'NexiPayment',
-  data() {
+  data () {
     const storeView = currentStoreView();
     return {
       currencyCode: storeView.i18n.currencyCode,
       locale: storeView.i18n.defaultLocale
     };
   },
-  async mounted() {
+  async mounted () {
     // do not await initLightbox, Nexi init freezes checkout UI
     this.initLightbox();
     window.addEventListener('XPay_Payment_Result', this.onPaymentResult);
   },
-  beforeDestroy() {
+  beforeDestroy () {
     window.removeEventListener('XPay_Payment_Result', this.onPaymentResult);
   },
   computed: {
     ...mapGetters({ cartTotals: 'cart/getTotals' }),
-    grandTotal() {
+    grandTotal () {
       return this.cartTotals.find((seg) => seg.code === 'grand_total').value;
     }
   },
   methods: {
-    async getPaymentConfiguration() {
-      return await store.dispatch('nexi/configuration', {
+    async getPaymentConfiguration () {
+      await store.dispatch('nexi/configuration', {
         grandTotal: this.grandTotal,
         currencyCode: this.currencyCode,
         locale: this.locale
       });
     },
-    async initLightbox() {
+    async initLightbox () {
       // TODO: ensure that Nexi SDK is loaded before XPay.init();
       try {
         XPay.init();
@@ -65,7 +68,7 @@ export default {
         console.error(e);
       }
     },
-    async refreshLightbox() {
+    async refreshLightbox () {
       try {
         const resp = await this.getPaymentConfiguration();
         if (resp.code === 200) {
@@ -79,10 +82,10 @@ export default {
         console.error(e);
       }
     },
-    onOrderConfirmed() {
+    onOrderConfirmed () {
       XPay.openLightbox();
     },
-    async onPaymentResult(e) {
+    async onPaymentResult (e) {
       // handle response
       if (e && e.detail && e.detail.esito === 'OK') {
         console.debug('success');
@@ -95,7 +98,7 @@ export default {
       }
       XPay.closeLightbox();
     },
-    async onPaymentError(e) {
+    async onPaymentError (e) {
       if (!e || !e.detail) {
         console.error('Incorrect Nexi payment response', e);
       }
@@ -105,7 +108,7 @@ export default {
       await this.showNotification(e);
       await this.refreshLightbox();
     },
-    async showNotification(e) {
+    async showNotification (e) {
       if (!e || !e.detail || e.detail.esito === 'ANNULLO') {
         return; // do not show any notification, user cancelled the payment operation
       }
@@ -123,7 +126,7 @@ export default {
         { root: true }
       );
     },
-    prepareErrorNotification(nexiResponse) {
+    prepareErrorNotification (nexiResponse) {
       // error messages are taken from nexi, they do not have much sense
 
       // because Nexi error handling sux and no user friendly messages are being returned

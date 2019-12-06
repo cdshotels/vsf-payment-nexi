@@ -5,7 +5,7 @@ import { adjustMultistoreApiUrl } from '@vue-storefront/core/lib/multistore';
 
 // it's a good practice for all actions to return Promises with effect of their execution
 export const actions: ActionTree<NexiState, any> = {
-  async configuration(_, { grandTotal, currencyCode, locale }) {
+  async configuration (_, { grandTotal, currencyCode, locale }) {
     let url = `${config.nexi.endpoint.configuration}?amount=${grandTotal}&currencyCode=${currencyCode}&locale=${locale}`;
     url = config.storeViews.multistore ? adjustMultistoreApiUrl(url) : url;
 
