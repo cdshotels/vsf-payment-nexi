@@ -20,10 +20,10 @@ export default {
   async mounted() {
     // do not await initLightbox, Nexi init freezes checkout UI
     this.initLightbox();
-    window.addEventListener('XPay_Payment_Result', this.paymentCallback);
+    window.addEventListener('XPay_Payment_Result', this.onPaymentResult);
   },
   beforeDestroy() {
-    window.removeEventListener('XPay_Payment_Result', this.paymentCallback);
+    window.removeEventListener('XPay_Payment_Result', this.onPaymentResult);
   },
   computed: {
     ...mapGetters({ cartTotals: 'cart/getTotals' }),
@@ -32,59 +32,182 @@ export default {
     }
   },
   methods: {
+    async getPaymentConfiguration() {
+      return await store.dispatch('nexi/configuration', {
+        grandTotal: this.grandTotal,
+        currencyCode: this.currencyCode,
+        locale: this.locale
+      });
+    },
     async initLightbox() {
       // TODO: ensure that Nexi SDK is loaded before XPay.init();
-      XPay.init();
+      try {
+        XPay.init();
 
-      return store
-        .dispatch('nexi/configuration')
-        .then((resp) => {
-          if (resp.code === 200) {
-            console.debug('Nexi configuration:' + resp);
+        const resp = await this.getPaymentConfiguration();
+        if (resp.code === 200) {
+          console.debug('Nexi configuration:' + resp);
 
-            XPay.initLightbox(resp.result.configuration);
+          XPay.initLightbox(resp.result.configuration);
 
-            var button = document.querySelector('.place-order-btn');
-            if (button) {
-              button.addEventListener('click', () => this.pay());
-            } else {
-              console.err(
-                'Confirm order button with class .place-order-btn was not found'
-              );
-            }
+          var button = document.querySelector('.place-order-btn');
+          if (button) {
+            button.addEventListener('click', () => this.onOrderConfirmed());
           } else {
-            console.err(resp);
+            console.err(
+              'Confirm order button with class .place-order-btn was not found'
+            );
           }
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+        } else {
+          console.error(resp);
+        }
+      } catch (e) {
+        console.error(e);
+      }
     },
-    pay() {
+    async refreshLightbox() {
+      try {
+        const resp = await this.getPaymentConfiguration();
+        if (resp.code === 200) {
+          console.debug('Nexi configuration:' + resp);
+
+          XPay.initLightbox(resp.result.configuration);
+        } else {
+          console.err(resp);
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    },
+    onOrderConfirmed() {
       XPay.openLightbox();
     },
-    paymentCallback(e) {
-      if (e && e.detail) {
-        // handle response
+    async onPaymentResult(e) {
+      // handle response
+      if (e && e.detail && e.detail.esito === 'OK') {
+        console.debug('success');
+        // console.debug(e.detail);
 
-        if (e.detail.esito === 'OK') {
-          console.debug('success');
-          // console.debug(e.detail);
-
-          // add payment result to order model and confirm order
-          EventBus.$emit('checkout-do-placeOrder', e.detail);
-        } else {
-          // TODO: handle nexi error codes and show error message
-          // TODO: refresh Nexi button (second operation with the same configuration and transaction ID fails to open lightbox)
-          console.error(e.detail);
-          EventBus.$emit('payment-nexi-cancelled', e);
-        }
+        // add payment result to order model and confirm order
+        EventBus.$emit('checkout-do-placeOrder', e.detail);
       } else {
-        // TODO: refresh Nexi button (second operation with the same configuration and transaction ID fails to open lightbox)
-        console.error('Incorrect Nexi payment response', e);
-        EventBus.$emit('payment-nexi-cancelled', e);
+        await this.onPaymentError(e);
       }
       XPay.closeLightbox();
+    },
+    async onPaymentError(e) {
+      if (!e || !e.detail) {
+        console.error('Incorrect Nexi payment response', e);
+      }
+
+      EventBus.$emit('payment-nexi-cancelled', e);
+
+      await this.showNotification(e);
+      await this.refreshLightbox();
+    },
+    async showNotification(e) {
+      if (!e || !e.detail || e.detail.esito === 'ANNULLO') {
+        return; // do not show any notification, user cancelled the payment operation
+      }
+
+      console.error(e.detail);
+
+      await store.dispatch(
+        'notification/spawnNotification',
+        {
+          type: 'error',
+          message: this.prepareErrorNotification(e.detail),
+          action1: { label: this.$t('OK') },
+          hasNoTimeout: true
+        },
+        { root: true }
+      );
+    },
+    prepareErrorNotification(nexiResponse) {
+      // error messages are taken from nexi, they do not have much sense
+
+      // because Nexi error handling sux and no user friendly messages are being returned
+      // (mix of english and italian phrases abbreviated),
+      // we have to prepare custom error messages based on error code
+      debugger;
+      // prepare default error message
+      let errorMessage = this.$t(
+        'An error occurred while processing the payment.'
+      );
+
+      if (nexiResponse.codiceEsito) {
+        errorMessage += ` ${this.$t('Reason:')} `;
+
+        switch (nexiResponse.codiceEsito) {
+          case '103':
+            errorMessage += this.$t('Authorization denied by the card issuer.');
+            break;
+
+          case '116':
+            const trans = (nexiResponse.tipoTransazione || '')
+              .trim()
+              .toLowerCase();
+            if (trans === 'no_3dsecure') {
+              errorMessage += this.$t(
+                'Your card is not enrolled for 3D Secure. This means that either the bank that issued the card is not yet supporting 3D Secure or it means that the card holder has not yet been registered for the service.'
+              );
+            } else {
+              errorMessage += this.$t('3D Secure canceled by user.');
+            }
+            break;
+
+          case '117':
+            errorMessage += this.$t(
+              'Unauthorized card due to BIN Table application rules.'
+            );
+            break;
+
+          case '119':
+            errorMessage += this.$t(
+              'Operator not authorized to operate in this mode'
+            );
+            break;
+
+          case '120':
+            errorMessage += this.$t(
+              'Circuit is not accepted, in the request message was indicated to accept payment with a circuit while the card pan is on another circuit.'
+            );
+            break;
+
+          case '400':
+            errorMessage += this.$t('Authorization denied');
+            break;
+
+          case '401':
+            errorMessage += this.$t('Card expired');
+            break;
+
+          case '402':
+            errorMessage += this.$t('Card restricted');
+            break;
+
+          case '403':
+            errorMessage += this.$t('Invalid merchant');
+            break;
+
+          case '404':
+            errorMessage += this.$t('Transaction not permited');
+            break;
+
+          case '405':
+            errorMessage += this.$t('Your card has insufficient funds');
+            break;
+
+          case '666':
+            errorMessage += this.$t(
+              'An error occurred while saving the payment information'
+            );
+            break;
+        }
+        errorMessage += ` (CODE: ${nexiResponse.codiceEsito})`;
+      }
+
+      return errorMessage;
     }
   }
 };
