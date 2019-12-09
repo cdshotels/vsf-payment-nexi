@@ -140,3 +140,38 @@ Add the following also to your `config/local.json` need set:
     }
   }
 ```
+
+And check after order confirmation if payment response is correct in file `/src/platform/magento2/e2m.js` (in case you use sync order confirmation without Kue):
+
+```js
+  import { NexiClient } from '../../api/extensions/payment-nexi/nexi-client';
+
+  function processSingleOrder (orderData, config, job, done, logger = console) {
+    ...
+
+    const paymentInfo =
+      orderData.addressInformation.payment_method_additional;
+
+    if (orderData.addressInformation.payment_method_code === 'vsfnexi') {
+      if (!paymentInfo || !paymentInfo.mac) {
+        return done(new Error('Additional payment info is missing'));
+      }
+
+      // check if payment hash is correct
+      const nexiClient = new NexiClient(config.extensions.paymentNexi);
+      const isValid = nexiClient.isPaymentValid({
+        transactionCode: paymentInfo.codTrans,
+        exit: paymentInfo.esito,
+        currency: paymentInfo.divisa,
+        amount: paymentInfo.importo,
+        date: paymentInfo.data,
+        hour: paymentInfo.orario,
+        authorizationCode: paymentInfo.codAut,
+        mac: paymentInfo.mac
+      });
+      if (!isValid) {
+        return done(new Error('Invalid nexi payment response'));
+      }
+    }
+  }
+```
