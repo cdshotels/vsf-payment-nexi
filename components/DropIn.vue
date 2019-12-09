@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     async getPaymentConfiguration () {
-      await store.dispatch('nexi/configuration', {
+      return await store.dispatch('nexi/configuration', {
         grandTotal: this.grandTotal,
         currencyCode: this.currencyCode,
         locale: this.locale
@@ -132,7 +132,7 @@ export default {
       // because Nexi error handling sux and no user friendly messages are being returned
       // (mix of english and italian phrases abbreviated),
       // we have to prepare custom error messages based on error code
-      debugger;
+      
       // prepare default error message
       let errorMessage = this.$t(
         'An error occurred while processing the payment.'
