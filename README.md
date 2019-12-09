@@ -84,20 +84,20 @@ Because Nexi error handling sux and no user friendly messages are being returned
 Add to your localization file(s) following error messages (and fix original translations according to your needs):
 
 ```csv
-"An error occurred while processing the payment.", "An error occurred while processing the payment."
+"An error occurred while processing the payment.", "An error occurred while processing the payment."
 "Authorization denied by the card issuer.", "Authorization denied by the card issuer."
-"Your card is not enrolled for 3D Secure. This means that either the bank that issued the card is not yet supporting 3D Secure or it means that the card holder has not yet been registered for the service.", "Your card is not enrolled for 3D Secure. This means that either the bank that issued the card is not yet supporting 3D Secure or it means that the card holder has not yet been registered for the service."
+"Your card is not enrolled for 3D Secure. This means that either the bank that issued the card is not yet supporting 3D Secure or it means that the card holder has not yet been registered for the service.", "Your card is not enrolled for 3D Secure. This means that either the bank that issued the card is not yet supporting 3D Secure or it means that the card holder has not yet been registered for the service."
 "Unauthorized card due to BIN Table application rules.", "Unauthorized card due to BIN Table application rules."
-"3D Secure canceled by user.", "3D Secure canceled by user."
-"Operator not authorized to operate in this mode", "Operator not authorized to operate in this mode"
-"Circuit is not accepted, in the request message was indicated to accept payment with a circuit while the card pan is on another circuit.", "Circuit is not accepted, in the request message was indicated to accept payment with a circuit while the card pan is on another circuit."
+"3D Secure canceled by user.", "3D Secure canceled by user."
+"Operator not authorized to operate in this mode.", "Operator not authorized to operate in this mode."
+"Circuit is not accepted, in the request message was indicated to accept payment with a circuit while the card pan is on another circuit.", "Circuit is not accepted, in the request message was indicated to accept payment with a circuit while the card pan is on another circuit."
 "Authorization denied", "Authorization denied"
-"Card expired", "Card expired"
-"Card restricted", "Card restricted"
-"Invalid merchant", "Invalid merchant"
-"Transaction not permited", "Transaction not permited"
-"Your card has insufficient funds", "Your card has insufficient funds"
-"An error occurred while saving the payment information", "An error occurred while saving the payment information"
+"Card expired", "Card expired"
+"Card restricted", "Card restricted"
+"Invalid merchant", "Invalid merchant"
+"Transaction not permited", "Transaction not permited"
+"Your card has insufficient funds", "Your card has insufficient funds"
+"An error occurred while saving the payment information", "An error occurred while saving the payment information"
 ```
 
 ## Nexi payment API extension

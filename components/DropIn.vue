@@ -136,7 +136,7 @@ export default {
 
       // prepare default error message
       let errorMessage = this.$t(
-        'An error occurred while processing the payment.'
+        'An error occurred while processing the payment.'
       );
 
       if (nexiResponse.codiceEsito) {
@@ -168,7 +168,7 @@ export default {
 
           case '119':
             errorMessage += this.$t(
-              'Operator not authorized to operate in this mode'
+              'Operator not authorized to operate in this mode.'
             );
             break;
 
