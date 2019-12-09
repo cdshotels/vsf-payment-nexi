@@ -36,11 +36,12 @@ export default {
   },
   methods: {
     async getPaymentConfiguration () {
-      return await store.dispatch('nexi/configuration', {
+      const configuration = await store.dispatch('nexi/configuration', {
         grandTotal: this.grandTotal,
         currencyCode: this.currencyCode,
         locale: this.locale
       });
+      return configuration;
     },
     async initLightbox () {
       // TODO: ensure that Nexi SDK is loaded before XPay.init();
@@ -132,7 +133,7 @@ export default {
       // because Nexi error handling sux and no user friendly messages are being returned
       // (mix of english and italian phrases abbreviated),
       // we have to prepare custom error messages based on error code
-      
+
       // prepare default error message
       let errorMessage = this.$t(
         'An error occurred while processing the payment.'
