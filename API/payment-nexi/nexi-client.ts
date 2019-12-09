@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Currency } from './types/currency';
-import { INexiClient } from './i-nexi-client';
+import { NexiClient as INexiClient } from './i-nexi-client';
 import { PaymentConfiguration } from './types/payment-configuration';
 import { NexiConfiguration } from './types/nexi-configuration';
 import { Environment } from './types/environment';
@@ -10,7 +10,7 @@ import { PaymentResult } from './types/payment-result';
 class NexiClient implements INexiClient {
   private config: NexiConfiguration;
 
-  constructor(config: NexiConfiguration) {
+  public constructor (config: NexiConfiguration) {
     if (!config) {
       throw new Error('Missing parameter config with nexi configuration');
     }
@@ -48,7 +48,7 @@ class NexiClient implements INexiClient {
    * Function converts language code to Nexi format.
    * @param isoLocale Language code with ISO 639-1 and 3166-1 standard, e.g. 'en' or 'en-US'
    */
-  getLanguage(isoLocale: string): Language {
+  public getLanguage (isoLocale: string): Language {
     // ISO locale 639-1 'en-US' change to 'en'
     let locale = (isoLocale || '').toLowerCase();
     locale = locale.length > 2 ? locale.substring(0, 2) : locale;
@@ -82,9 +82,9 @@ class NexiClient implements INexiClient {
    * Function converts currency to Nexi format.
    * @param currency
    */
-  getCurrency(currency: string): Currency {
+  public getCurrency (currency: string): Currency {
     const curr = Currency[currency];
-    return curr ? curr : Currency[this.config.defaultLanguage];
+    return curr || Currency[this.config.defaultLanguage];
   }
 
   /**
@@ -93,7 +93,7 @@ class NexiClient implements INexiClient {
    * @param amount Amount to be paid.
    * @param secret Nexi secret key.
    */
-  getPaymentConfiguration(
+  public getPaymentConfiguration (
     language: Language,
     currency: Currency,
     amount: number
@@ -133,7 +133,7 @@ class NexiClient implements INexiClient {
    * @param currency Currency enum type.
    * @param nexiAmount Amount to be paid in nexi format, e.g. 4025 for 40.25 €.
    */
-  createHashMac(
+  public createHashMac (
     transactionCode: string,
     currency: Currency,
     nexiAmount: number
@@ -148,7 +148,7 @@ class NexiClient implements INexiClient {
       .digest('hex');
   }
 
-  isPaymentValid(result: PaymentResult): boolean {
+  public isPaymentValid (result: PaymentResult): boolean {
     const resultHash = this.createResultHashMac(
       result.transactionCode,
       result.exit,
@@ -166,7 +166,7 @@ class NexiClient implements INexiClient {
    * Converts number to nexi format. Example 40.25 € converts to 4025.
    * @param num
    */
-  private convertNumberToBankFormat(num: number): number {
+  private convertNumberToBankFormat (num: number): number {
     return Math.round(num * 100);
   }
 
@@ -180,7 +180,7 @@ class NexiClient implements INexiClient {
    * @param hour Hour of payment.
    * @param authorizationCode Authorization code.
    */
-  private createResultHashMac(
+  private createResultHashMac (
     transactionCode: string,
     exit: string,
     currency: string,

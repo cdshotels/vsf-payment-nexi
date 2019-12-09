@@ -3,18 +3,18 @@ import { PaymentConfiguration } from './types/payment-configuration';
 import { Language } from './types/language';
 import { PaymentResult } from './types/payment-result';
 
-export interface INexiClient {
+export interface NexiClient {
   /**
    * Function converts language code to Nexi format.
    * @param isoLocale Language code with ISO 639-1 and 3166-1 standard, e.g. 'en' or 'en-US'
    */
-  getLanguage(isoLocale: string): Language;
+  getLanguage(isoLocale: string): Language,
 
   /**
    * Function converts currency to Nexi format.
    * @param currency
    */
-  getCurrency(currency: string): Currency;
+  getCurrency(currency: string): Currency,
 
   /**
    * Prepares Nexi payment configuration with unique transaction code and encrypted mac.
@@ -26,7 +26,7 @@ export interface INexiClient {
     language: Language,
     currency: Currency,
     amount: number
-  ): PaymentConfiguration;
+  ): PaymentConfiguration,
 
   /**
    * Creates hash based on transaction code, currency, amount to pay and secret key
@@ -38,11 +38,11 @@ export interface INexiClient {
     transactionCode: string,
     currency: Currency,
     amount: number
-  ): string;
+  ): string,
 
   /**
    * Validates payment response from nexi.
    * @param result Payment response from nexi.
    */
-  isPaymentValid(result: PaymentResult): boolean;
+  isPaymentValid(result: PaymentResult): boolean
 }
