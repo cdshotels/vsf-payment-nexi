@@ -1,6 +1,6 @@
 // reverse mapping for string values enum members does not work in Typescript, so names === codes
 
-export const enum Currency {
+export enum Currency {
   EUR = 'EUR', // 978 Euro
   AUD = 'AUD', // 036 Dollaro Australiano
   CAD = 'CAD', // 124 Dollaro Canadese

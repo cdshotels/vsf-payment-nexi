@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import { Currency } from './types/currency';
-import { NexiClient as INexiClient } from './i-nexi-client';
+import { NexiClient as INexiClient } from './inexi-client';
 import { PaymentConfiguration } from './types/payment-configuration';
 import { NexiConfiguration } from './types/nexi-configuration';
 import { Environment } from './types/environment';
@@ -84,7 +84,7 @@ class NexiClient implements INexiClient {
    */
   public getCurrency (currency: string): Currency {
     const curr = Currency[currency];
-    return curr || Currency[this.config.defaultLanguage];
+    return curr || Currency[this.config.defaultCurrency];
   }
 
   /**
