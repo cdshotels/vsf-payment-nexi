@@ -34,6 +34,11 @@ export default {
       return this.cartTotals.find((seg) => seg.code === 'grand_total').value;
     }
   },
+  watch: {
+    async grandTotal (total) {
+      await this.refreshLightbox();
+    }
+  },
   methods: {
     async getPaymentConfiguration () {
       const configuration = await store.dispatch('nexi/configuration', {
