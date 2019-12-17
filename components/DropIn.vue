@@ -213,7 +213,8 @@ export default {
             );
             break;
         }
-        errorMessage += ` (CODE: ${nexiResponse.codiceEsito})`;
+        errorMessage += ' ' + this.$t('(CODE: {code})', { code: nexiResponse.codiceEsito });
+        errorMessage += ' ' + this.$t('Please contact as soon as possible our Information and Booking Office at +39 0832 35 13 21 (int. 1).');
       }
 
       return errorMessage;
